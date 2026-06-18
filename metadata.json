@@ -1,6 +1,0 @@
-{
-  "name": "Au 999.9 Gold Monitor",
-  "description": "A real-time gold price monitor (Au 999.9) in Malaysian Ringgit (MYR/g) with live interactive 30-day historical chart, multi-language support (English/Bahasa Melayu), and custom price alerts with notifications.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
