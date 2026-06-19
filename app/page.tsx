@@ -27,6 +27,7 @@ const TROY = 31.1035;
 const GOLD_API = "https://api.gold-api.com";
 const FX_API = "https://open.er-api.com/v6/latest/USD";
 const STORAGE_KEY = "au999_goldapi_key";
+const DEFAULT_API_KEY = process.env.NEXT_PUBLIC_GOLD_API_KEY ?? "";
 
 function getNowTs(): number {
   return Math.floor(Date.now() / 1000);
@@ -508,14 +509,16 @@ export default function GoldMonitor() {
         console.error(e);
       }
 
-      // 5. Initial Data Fetching check if Key exists
+      // 5. Pre-seed default API key if none stored, then fetch
+      if (!localStorage.getItem(STORAGE_KEY) && DEFAULT_API_KEY) {
+        localStorage.setItem(STORAGE_KEY, DEFAULT_API_KEY);
+      }
       const key = localStorage.getItem(STORAGE_KEY);
       if (!key) {
         setKeyModalOpen(true);
       } else {
         fetchLiveData();
       }
-    }, 0);
 
     // 4. Request Notifications
     if (typeof window !== "undefined" && "Notification" in window) {
