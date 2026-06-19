@@ -509,7 +509,7 @@ export default function GoldMonitor() {
         console.error(e);
       }
 
-      // 5. Pre-seed default API key if none stored, then fetch
+      // 4. Pre-seed default API key if none stored, then fetch
       if (!localStorage.getItem(STORAGE_KEY) && DEFAULT_API_KEY) {
         localStorage.setItem(STORAGE_KEY, DEFAULT_API_KEY);
       }
@@ -519,8 +519,9 @@ export default function GoldMonitor() {
       } else {
         fetchLiveData();
       }
+    }, 0);
 
-    // 4. Request Notifications
+    // 5. Request Notifications
     if (typeof window !== "undefined" && "Notification" in window) {
       if (Notification.permission !== "granted" && Notification.permission !== "denied") {
         Notification.requestPermission();
