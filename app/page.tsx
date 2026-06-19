@@ -1347,14 +1347,23 @@ export default function GoldMonitor() {
       {keyModalOpen && (
         <div className="fixed inset-0 bg-[#000000]/70 flex items-center justify-center p-6 z-[2000] backdrop-blur-xs select-none">
           <div className={`border-[0.5px] ${css.borderAlt} rounded-2xl p-6 w-full max-w-[440px] shadow-2xl ${theme === "dark" ? "bg-[#111108]" : "bg-[#FEFCF6]"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-3.5 mb-5">
-              <div className="w-10 h-10 rounded-lg bg-[rgba(201,151,42,0.12)] border border-[rgba(201,151,42,0.22)] flex items-center justify-center flex-shrink-0">
-                <Key className="w-5 h-5 text-[#C9972A]" />
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-lg bg-[rgba(201,151,42,0.12)] border border-[rgba(201,151,42,0.22)] flex items-center justify-center flex-shrink-0">
+                  <Key className="w-5 h-5 text-[#C9972A]" />
+                </div>
+                <div>
+                  <h3 className="font-[family:var(--font-barlow)] text-xl font-bold leading-normal">{t("modal_title")}</h3>
+                  <p className={`text-xs ${css.textMuted} mt-0.5`}>{t("modal_sub")}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-[family:var(--font-barlow)] text-xl font-bold leading-normal">{t("modal_title")}</h3>
-                <p className={`text-xs ${css.textMuted} mt-0.5`}>{t("modal_sub")}</p>
-              </div>
+              <button
+                onClick={() => setKeyModalOpen(false)}
+                className={`w-8 h-8 rounded-md border ${css.borderDim} bg-transparent text-lg leading-none cursor-pointer text-[inherit] hover:text-[#C9972A] transition-colors flex items-center justify-center`}
+                aria-label="Close modal"
+              >
+                ×
+              </button>
             </div>
 
             <div className="space-y-3.5 mb-5">
