@@ -186,7 +186,7 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     add_btn: "+ Tambah",
     no_alerts: "Tiada amaran ditetapkan. Masukkan harga sasaran di atas.",
     badge_above: "↑ melebihi",
-    badge_below: "di bawah",
+    badge_below: "↓ di bawah",
     badge_hit: "⚡ dicetuskan",
     triggered_msg: (g: string, dir: string, p: string) => 
       `🏅 Amaran: Au999.9 kini RM ${g}/g — ${dir} RM ${p} dicetuskan!`,
@@ -388,19 +388,21 @@ export default function GoldMonitor() {
 
   // Real-time gold spot price, BN FX Rate, and OHLC calculations
   async function fetchLiveData() {
+    const key = localStorage.getItem(STORAGE_KEY);
+    if (!key) {
+      setKeyModalOpen(true);
+      return;
+    }
     setLoading(true);
-    const key = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
 
     try {
       const nowTs = getNowTs();
       const [priceRes, fxRes, ohlcRes] = await Promise.all([
         fetch(`${GOLD_API}/price/XAU`),
         fetch(FX_API),
-        key 
-          ? fetch(`${GOLD_API}/ohlc/XAU?startTimestamp=${nowTs - 86400}&endTimestamp=${nowTs}`, {
-              headers: { "x-api-key": key }
-            })
-          : Promise.resolve(null)
+        fetch(`${GOLD_API}/ohlc/XAU?startTimestamp=${nowTs - 86400}&endTimestamp=${nowTs}`, {
+          headers: { "x-api-key": key }
+        })
       ]);
 
       if (!priceRes.ok) throw new Error(`/price/XAU returns HTTP status ${priceRes.status}`);
@@ -422,12 +424,12 @@ export default function GoldMonitor() {
       let highUsd = xauUsd * 1.005;
       let lowUsd = xauUsd * 0.995;
 
-      if (ohlcRes && ohlcRes.ok) {
+      if (ohlcRes.ok) {
         const ohlc = await ohlcRes.json();
         if (typeof ohlc.open === "number") openUsd = ohlc.open;
         if (typeof ohlc.high === "number") highUsd = ohlc.high;
         if (typeof ohlc.low === "number") lowUsd = ohlc.low;
-      } else if (ohlcRes && (ohlcRes.status === 401 || ohlcRes.status === 403)) {
+      } else if (ohlcRes.status === 401 || ohlcRes.status === 403) {
         localStorage.removeItem(STORAGE_KEY);
         setLoading(false);
         setKeyModalOpen(true);
@@ -506,8 +508,13 @@ export default function GoldMonitor() {
         console.error(e);
       }
 
-      // 5. Initial Data Fetching (unconditional: skips OHLC fallback on boot if API Key doesn't exist)
-      fetchLiveData();
+      // 5. Initial Data Fetching check if Key exists
+      const key = localStorage.getItem(STORAGE_KEY);
+      if (!key) {
+        setKeyModalOpen(true);
+      } else {
+        fetchLiveData();
+      }
     }, 0);
 
     // 4. Request Notifications
@@ -599,6 +606,8 @@ export default function GoldMonitor() {
     updateAlertsPersisted(filtered);
   };
 
+  // Removed duplicate alert checking functions (repositioned to top under state definitions)
+
   /* ════════════════════════════════════════════════
      HISTORY CHART LOGIC
      Dynamically imports ChartJS directly inside browser
@@ -618,8 +627,8 @@ export default function GoldMonitor() {
   const loadChartData = async () => {
     const key = localStorage.getItem(STORAGE_KEY);
     if (!key) {
-      setKeyError("API key is required to load interactive index chart.");
       setKeyModalOpen(true);
+      setKeyError("API key is required to load interactive index chart.");
       return;
     }
 
@@ -1597,7 +1606,7 @@ export default function GoldMonitor() {
                       <p className="text-xs leading-relaxed text-[inherit]" dangerouslySetInnerHTML={{ __html: t("s3_r0") }} />
                     </div>
                     <div className="flex gap-3.5 items-start">
-                      <div className="w-8 h-8 rounded-lg bg-[rgba(122,117,104,0.15)] border border-[rgba(122,117,104,0.25)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-8 h-8 rounded-lg bg-[rgba(122,117,104,0.1)] border border-[rgba(122,117,104,0.2)] flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Layers className="w-4 h-4 text-[#7A7568]" />
                       </div>
                       <p className="text-xs leading-relaxed text-[inherit]" dangerouslySetInnerHTML={{ __html: t("s3_r1") }} />
