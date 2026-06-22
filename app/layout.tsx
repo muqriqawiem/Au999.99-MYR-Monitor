@@ -17,7 +17,7 @@ const barlowCondensed = Barlow_Condensed({
 
 export const metadata: Metadata = {
   title: 'Au 999.9 · Gold Monitor MYR',
-  description: 'An elegant real-time gold price monitor (Au 999.9) in Malaysian Ringgit (MYR/g)',
+  description: 'A real-time gold price monitor (Au 999.9) in Malaysian Ringgit (MYR/g)',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
