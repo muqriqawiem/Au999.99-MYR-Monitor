@@ -1254,101 +1254,6 @@ export default function GoldMonitor() {
           </p>
         </section>
 
-        {/* ════ MATHEMATICAL VALUATION CARD PANEL ════ */}
-        <section className={`border-[0.5px] ${css.borderMain} ${css.bgSurface} rounded-xl p-5 mb-6 shadow-md transition-all`}>
-          <div className="flex items-center gap-2.5 pb-4 border-b border-[rgba(201,151,42,0.06)]">
-            <Scale className="w-4 h-4 text-[#C9972A]" />
-            <span className={`text-[10px] uppercase font-bold tracking-widest ${css.textMuted}`}>
-              {t("val_card_title")}
-            </span>
-          </div>
-
-          {!valuation ? (
-            <div className="py-8 text-center">
-              <p className={`text-xs ${css.textMuted} mb-4`}>{t("val_not_computed")}</p>
-              <button 
-                onClick={loadChartData} 
-                disabled={chartLoading}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-transparent border border-[rgba(201,151,42,0.35)] text-[#C9972A] hover:bg-[rgba(201,151,42,0.08)] hover:text-[#E8B84B] font-semibold text-xs rounded transition-colors cursor-pointer"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${chartLoading ? "animate-spin" : ""}`} />
-                <span>{t("ch_load_btn")}</span>
-              </button>
-            </div>
-          ) : (
-            <div className="pt-4 space-y-6">
-              
-              {/* Core Status & Color Gauge Banner */}
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2.5">
-                    <span className={`w-3 h-3 rounded-full ${
-                      valuation.status === "UNDERVALUED" ? "bg-[#4CAF72]" :
-                      valuation.status === "BELOW_AVERAGE" ? "bg-[#81C784]" :
-                      valuation.status === "FAIR_VALUE" ? "bg-[#E8B84B]" :
-                      valuation.status === "ABOVE_AVERAGE" ? "bg-[#FFB74D]" : "bg-[#E05555]"
-                    }`} />
-                    <h4 className="font-bold text-lg tracking-tight">
-                      {valuation.status === "UNDERVALUED" && t("val_status_undervalued")}
-                      {valuation.status === "BELOW_AVERAGE" && t("val_status_belowaverage")}
-                      {valuation.status === "FAIR_VALUE" && t("val_status_fairvalue")}
-                      {valuation.status === "ABOVE_AVERAGE" && t("val_status_aboveaverage")}
-                      {valuation.status === "OVEREXTENDED" && t("val_status_overextended")}
-                    </h4>
-                  </div>
-                  <p className={`text-xs leading-relaxed mt-1.5 ${css.textMuted}`}>
-                    {valuation.status === "UNDERVALUED" && t("val_desc_undervalued")}
-                    {valuation.status === "BELOW_AVERAGE" && t("val_desc_belowaverage")}
-                    {valuation.status === "FAIR_VALUE" && t("val_desc_fairvalue")}
-                    {valuation.status === "ABOVE_AVERAGE" && t("val_desc_aboveaverage")}
-                    {valuation.status === "OVEREXTENDED" && t("val_desc_overextended")}
-                  </p>
-                </div>
-                
-                {/* Numeric Big Indicators */}
-                <div className="flex items-center gap-4 flex-shrink-0">
-                  <div className={`px-4 py-2.5 rounded-lg ${css.bgPanel} text-center min-w-[100px] border ${css.borderMain}`}>
-                    <span className={`text-[9px] block uppercase font-bold tracking-wider ${css.textMuted} mb-1`}>{t("val_metric_percentile")}</span>
-                    <span className="font-[family:var(--font-barlow)] text-xl font-bold">{valuation.percentile}%</span>
-                  </div>
-                  <div className={`px-4 py-2.5 rounded-lg ${css.bgPanel} text-center min-w-[100px] border ${css.borderMain}`}>
-                    <span className={`text-[9px] block uppercase font-bold tracking-wider ${css.textMuted} mb-1`}>{t("val_metric_zscore")}</span>
-                    <span className="font-[family:var(--font-barlow)] text-xl font-bold">{valuation.zScore > 0 ? `+${valuation.zScore}` : valuation.zScore}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Visual Distribution Range Bar */}
-              <div className="space-y-2">
-                <div className="relative w-full h-3 rounded-full bg-[rgba(201,151,42,0.06)] border border-[rgba(201,151,42,0.12)] overflow-visible">
-                  {/* Visual segment bands */}
-                  <div className="absolute top-0 bottom-0 left-0 w-[20%] bg-[#4CAF72]/15 rounded-l-full" title="0-20%: Undervalued" />
-                  <div className="absolute top-0 bottom-0 left-[20%] w-[25%] bg-[#81C784]/10" title="20-45%: Below Average" />
-                  <div className="absolute top-0 bottom-0 left-[45%] w-[10%] bg-[#E8B84B]/10" title="45-55%: Fair Value" />
-                  <div className="absolute top-0 bottom-0 left-[55%] w-[25%] bg-[#FFB74D]/10" title="55-80%: Above Average" />
-                  <div className="absolute top-0 bottom-0 left-[80%] w-[20%] bg-[#E05555]/15 rounded-r-full" title="80-100%: Overextended" />
-
-                  {/* Pin tracker representation */}
-                  <div 
-                    className="absolute top-1/2 -translate-y-1/2 -ml-2 w-4 h-4 rounded-full bg-[#E8B84B] border-2 border-[#131310] shadow-[0_0_10px_rgba(232,184,75,0.6)] flex items-center justify-center z-10 transition-all duration-500"
-                    style={{ left: `${valuation.percentile}%` }}
-                  >
-                    <div className="w-1 h-1 rounded-full bg-black"></div>
-                  </div>
-                </div>
-
-                {/* Range markers */}
-                <div className="flex items-center justify-between text-[10px] font-semibold text-[#6B6455]">
-                  <span>RM {valuation.min30d.toFixed(2)} ({lang === "bm" ? "Min 30-Hari" : "30D Min"})</span>
-                  <span>RM {valuation.mean30d.toFixed(2)} ({lang === "bm" ? "Purata" : "Average"})</span>
-                  <span>RM {valuation.max30d.toFixed(2)} ({lang === "bm" ? "Maks 30-Hari" : "30D Max"})</span>
-                </div>
-              </div>
-
-            </div>
-          )}
-        </section>
-
         {/* FIVE-KEY METRICS STRIP CARD-GRID */}
         <section className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-px ${css.bgPanel} border-[0.5px] ${css.borderMain} rounded-xl overflow-hidden mb-6`}>
           {/* Price per troy oz */}
@@ -1448,6 +1353,101 @@ export default function GoldMonitor() {
               Reset
             </button>
           </div>
+        </section>
+
+        {/* ════ MATHEMATICAL VALUATION CARD PANEL ════ */}
+        <section className={`border-[0.5px] ${css.borderMain} ${css.bgSurface} rounded-xl p-5 mb-6 shadow-md transition-all`}>
+          <div className="flex items-center gap-2.5 pb-4 border-b border-[rgba(201,151,42,0.06)]">
+            <Scale className="w-4 h-4 text-[#C9972A]" />
+            <span className={`text-[10px] uppercase font-bold tracking-widest ${css.textMuted}`}>
+              {t("val_card_title")}
+            </span>
+          </div>
+
+          {!valuation ? (
+            <div className="py-8 text-center">
+              <p className={`text-xs ${css.textMuted} mb-4`}>{t("val_not_computed")}</p>
+              <button 
+                onClick={loadChartData} 
+                disabled={chartLoading}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-transparent border border-[rgba(201,151,42,0.35)] text-[#C9972A] hover:bg-[rgba(201,151,42,0.08)] hover:text-[#E8B84B] font-semibold text-xs rounded transition-colors cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${chartLoading ? "animate-spin" : ""}`} />
+                <span>{t("ch_load_btn")}</span>
+              </button>
+            </div>
+          ) : (
+            <div className="pt-4 space-y-6">
+              
+              {/* Core Status & Color Gauge Banner */}
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2.5">
+                    <span className={`w-3 h-3 rounded-full ${
+                      valuation.status === "UNDERVALUED" ? "bg-[#4CAF72]" :
+                      valuation.status === "BELOW_AVERAGE" ? "bg-[#81C784]" :
+                      valuation.status === "FAIR_VALUE" ? "bg-[#E8B84B]" :
+                      valuation.status === "ABOVE_AVERAGE" ? "bg-[#FFB74D]" : "bg-[#E05555]"
+                    }`} />
+                    <h4 className="font-bold text-lg tracking-tight">
+                      {valuation.status === "UNDERVALUED" && t("val_status_undervalued")}
+                      {valuation.status === "BELOW_AVERAGE" && t("val_status_belowaverage")}
+                      {valuation.status === "FAIR_VALUE" && t("val_status_fairvalue")}
+                      {valuation.status === "ABOVE_AVERAGE" && t("val_status_aboveaverage")}
+                      {valuation.status === "OVEREXTENDED" && t("val_status_overextended")}
+                    </h4>
+                  </div>
+                  <p className={`text-xs leading-relaxed mt-1.5 ${css.textMuted}`}>
+                    {valuation.status === "UNDERVALUED" && t("val_desc_undervalued")}
+                    {valuation.status === "BELOW_AVERAGE" && t("val_desc_belowaverage")}
+                    {valuation.status === "FAIR_VALUE" && t("val_desc_fairvalue")}
+                    {valuation.status === "ABOVE_AVERAGE" && t("val_desc_aboveaverage")}
+                    {valuation.status === "OVEREXTENDED" && t("val_desc_overextended")}
+                  </p>
+                </div>
+                
+                {/* Numeric Big Indicators */}
+                <div className="flex items-center gap-4 flex-shrink-0">
+                  <div className={`px-4 py-2.5 rounded-lg ${css.bgPanel} text-center min-w-[100px] border ${css.borderMain}`}>
+                    <span className={`text-[9px] block uppercase font-bold tracking-wider ${css.textMuted} mb-1`}>{t("val_metric_percentile")}</span>
+                    <span className="font-[family:var(--font-barlow)] text-xl font-bold">{valuation.percentile}%</span>
+                  </div>
+                  <div className={`px-4 py-2.5 rounded-lg ${css.bgPanel} text-center min-w-[100px] border ${css.borderMain}`}>
+                    <span className={`text-[9px] block uppercase font-bold tracking-wider ${css.textMuted} mb-1`}>{t("val_metric_zscore")}</span>
+                    <span className="font-[family:var(--font-barlow)] text-xl font-bold">{valuation.zScore > 0 ? `+${valuation.zScore}` : valuation.zScore}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Distribution Range Bar */}
+              <div className="space-y-2">
+                <div className="relative w-full h-3 rounded-full bg-[rgba(201,151,42,0.06)] border border-[rgba(201,151,42,0.12)] overflow-visible">
+                  {/* Visual segment bands */}
+                  <div className="absolute top-0 bottom-0 left-0 w-[20%] bg-[#4CAF72]/15 rounded-l-full" title="0-20%: Undervalued" />
+                  <div className="absolute top-0 bottom-0 left-[20%] w-[25%] bg-[#81C784]/10" title="20-45%: Below Average" />
+                  <div className="absolute top-0 bottom-0 left-[45%] w-[10%] bg-[#E8B84B]/10" title="45-55%: Fair Value" />
+                  <div className="absolute top-0 bottom-0 left-[55%] w-[25%] bg-[#FFB74D]/10" title="55-80%: Above Average" />
+                  <div className="absolute top-0 bottom-0 left-[80%] w-[20%] bg-[#E05555]/15 rounded-r-full" title="80-100%: Overextended" />
+
+                  {/* Pin tracker representation */}
+                  <div 
+                    className="absolute top-1/2 -translate-y-1/2 -ml-2 w-4 h-4 rounded-full bg-[#E8B84B] border-2 border-[#131310] shadow-[0_0_10px_rgba(232,184,75,0.6)] flex items-center justify-center z-10 transition-all duration-500"
+                    style={{ left: `${valuation.percentile}%` }}
+                  >
+                    <div className="w-1 h-1 rounded-full bg-black"></div>
+                  </div>
+                </div>
+
+                {/* Range markers */}
+                <div className="flex items-center justify-between text-[10px] font-semibold text-[#6B6455]">
+                  <span>RM {valuation.min30d.toFixed(2)} ({lang === "bm" ? "Min 30-Hari" : "30D Min"})</span>
+                  <span>RM {valuation.mean30d.toFixed(2)} ({lang === "bm" ? "Purata" : "Average"})</span>
+                  <span>RM {valuation.max30d.toFixed(2)} ({lang === "bm" ? "Maks 30-Hari" : "30D Max"})</span>
+                </div>
+              </div>
+
+            </div>
+          )}
         </section>
 
         {/* ════ HISTORICAL RANGE CHART PANEL ════ */}
