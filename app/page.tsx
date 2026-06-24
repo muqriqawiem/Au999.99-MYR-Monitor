@@ -17,7 +17,8 @@ import {
   TrendingUp, 
   Info,
   Layers,
-  ChevronDown
+  ChevronDown,
+  Scale
 } from "lucide-react";
 
 /* ════════════════════════════════════════════════
@@ -167,6 +168,23 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     ch_leg_band: "Daily range (High–Low band)",
     ch_leg_today: "Most recent day",
     ch_zoom_hint: "Scroll to zoom · Drag to pan",
+
+    // Valuation Indicator Localization
+    val_card_title: "Is gold expensive today?",
+    val_not_computed: "Load 30-day chart data to analyze valuation indicators.",
+    val_metric_percentile: "Percentile Rank",
+    val_metric_zscore: "Z-Score Deviation",
+    val_metric_range: "30-Day Range Bound",
+    val_status_undervalued: "Undervalued (Discount Window)",
+    val_status_belowaverage: "Below Average Price",
+    val_status_fairvalue: "Fair Value (Median)",
+    val_status_aboveaverage: "Above Average Price",
+    val_status_overextended: "Overextended (Local Peak)",
+    val_desc_undervalued: "The gold price sits near local lows. Historically favorable window for lump-sum or scheduled purchases.",
+    val_desc_belowaverage: "Gold is trading in the lower half of its 30-day historical distribution. Statistically sound buying region.",
+    val_desc_fairvalue: "Trading close to the mathematical 30-day median. Safe for standard transactional requirements.",
+    val_desc_aboveaverage: "Price is elevated above median parameters. Consider splitting purchases into smaller tranches (DCA).",
+    val_desc_overextended: "Trading near peak standard deviations. High short-term pullback probability. Avoid large capital allocations today."
   },
   bm: {
     brand_title: "Monitor Au 999.9",
@@ -201,7 +219,7 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     add_btn: "+ Tambah",
     no_alerts: "Tiada amaran ditetapkan. Masukkan harga sasaran di atas.",
     badge_above: "↑ melebihi",
-    badge_below: "↓ di bawah",
+    badge_below: "di bawah",
     badge_hit: "⚡ dicetuskan",
     triggered_msg: (g: string, dir: string, p: string) => 
       `🏅 Amaran: Au999.9 kini RM ${g}/g — ${dir} RM ${p} dicetuskan!`,
@@ -283,7 +301,7 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     ch_title: "Julat 30 Hari · Tertinggi · Purata · Terendah Harian · RM/gram",
     ch_load_btn: "Muatkan carta",
     ch_status_idle: "Klik 'Muatkan carta' untuk mengambil 30 hari data sebenar",
-    ch_loading: "Mengambil sejarah 30 hari (3 panggilan API)…",
+    ch_loading: "Mengambil sejarah 30 hari (3 panggilan API)...",
     ch_ok: (n: number, r: string) => `${n} hari dimuatkan · USD/RM ${r}`,
     ch_err: (m: string) => `⚠ ${m}`,
     ch_rate_limit: "Had kadar terpukul — percuma hanya 10 amaran/jam. Tunggu beberapa minit.",
@@ -294,6 +312,23 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     ch_leg_band: "Julat harian (Jalur Tinggi–Rendah)",
     ch_leg_today: "Hari ini",
     ch_zoom_hint: "Skrol untuk zum · Seret untuk menggerak",
+
+    // Valuation Indicator BM Localization
+    val_card_title: "Adakah emas mahal hari ini?",
+    val_not_computed: "Muatkan data carta 30-hari untuk menganalisis penunjuk penilaian.",
+    val_metric_percentile: "Peringkat Persentil",
+    val_metric_zscore: "Sisihan Skor-Z",
+    val_metric_range: "Sempadan Julat 30-Hari",
+    val_status_undervalued: "Kurang Nilai (Tetingkap Diskaun)",
+    val_status_belowaverage: "Di Bawah Harga Purata",
+    val_status_fairvalue: "Nilai Saksama (Median)",
+    val_status_aboveaverage: "Di Atas Harga Purata",
+    val_status_overextended: "Nilai Terlebih Tinggi (Puncak Tempatan)",
+    val_desc_undervalued: "Harga emas berada berhampiran paras terendah tempatan. Masa yang sangat sesuai untuk pembelian sekaligus atau terkumpul.",
+    val_desc_belowaverage: "Emas didagangkan di bawah separuh daripada taburan sejarah 30 hari. Kawasan belian yang kukuh dari segi statistik.",
+    val_desc_fairvalue: "Didagangkan berhampiran median matematik 30 hari. Selamat untuk keperluan transaksi standard.",
+    val_desc_aboveaverage: "Harga meningkat melebihi parameter median. Pertimbangkan untuk membahagikan pembelian kepada bahagian yang lebih kecil (DCA).",
+    val_desc_overextended: "Didagangkan berhampiran puncak sisihan piawai. Kebarangkalian tinggi untuk penurunan jangka pendek. Elakkan pembelian besar hari ini."
   }
 };
 
@@ -335,6 +370,16 @@ export default function GoldMonitor() {
   });
 
   const [loading, setLoading] = useState(false);
+
+  // Valuation Assessment State
+  const [valuation, setValuation] = useState<{
+    percentile: number;
+    zScore: number;
+    mean30d: number;
+    min30d: number;
+    max30d: number;
+    status: "UNDERVALUED" | "BELOW_AVERAGE" | "FAIR_VALUE" | "ABOVE_AVERAGE" | "OVEREXTENDED";
+  } | null>(null);
 
   // Price Alerts
   const [alerts, setAlerts] = useState<Array<{ id: number; price: number; dir: string; triggered: boolean }>>([]);
@@ -650,8 +695,6 @@ export default function GoldMonitor() {
     setCalculator({ myr: "", gram: "" });
   };
 
-  // Removed duplicate alert checking functions (repositioned to top under state definitions)
-
   /* ════════════════════════════════════════════════
      HISTORY CHART LOGIC
      Dynamically imports ChartJS directly inside browser
@@ -737,6 +780,9 @@ export default function GoldMonitor() {
         throw new Error("No historical coordinates parsed. Check credentials.");
       }
 
+      // Compute Valuation Metrics prior to plotting visual graphs
+      evaluateValuationData(normalizedDays, pricesGram.gram || (market.xau_usd * latestUsdMyr / TROY));
+
       // Load Chart modules dynamically to support NextJS standalone build with code splitting
       await chInitializeAndPlot(normalizedDays, latestUsdMyr);
 
@@ -746,6 +792,55 @@ export default function GoldMonitor() {
       setChStatusText(t("ch_err")(err.message));
       console.error(err);
     }
+  };
+
+  /**
+   * Evaluates the standard statistical parameters of the current price compared to 30D lookback
+   */
+  const evaluateValuationData = (days: any[], currentPriceMyrGram: number) => {
+    const prices = days.map(d => d.avgMyr).filter((p): p is number => p !== null && p > 0);
+    if (prices.length === 0 || currentPriceMyrGram <= 0) return;
+
+    const N = prices.length;
+    
+    // 1. Mean Average Calculation
+    const sum = prices.reduce((a, b) => a + b, 0);
+    const mean = sum / N;
+
+    // 2. Standard Deviation Calculation
+    const variance = prices.reduce((acc, p) => acc + Math.pow(p - mean, 2), 0) / N;
+    const stdDev = Math.sqrt(variance);
+
+    // 3. Z-Score Calculation
+    const zScore = stdDev > 0 ? (currentPriceMyrGram - mean) / stdDev : 0;
+
+    // 4. Percentile Rank Calculation
+    const daysBelow = prices.filter(p => p < currentPriceMyrGram).length;
+    const daysEqual = prices.filter(p => p === currentPriceMyrGram).length;
+    const percentile = ((daysBelow + (0.5 * daysEqual)) / N) * 100;
+
+    // 5. Map status
+    let status: "UNDERVALUED" | "BELOW_AVERAGE" | "FAIR_VALUE" | "ABOVE_AVERAGE" | "OVEREXTENDED" = "FAIR_VALUE";
+    if (percentile <= 20) {
+      status = "UNDERVALUED";
+    } else if (percentile > 20 && percentile <= 45) {
+      status = "BELOW_AVERAGE";
+    } else if (percentile > 45 && percentile <= 55) {
+      status = "FAIR_VALUE";
+    } else if (percentile > 55 && percentile <= 80) {
+      status = "ABOVE_AVERAGE";
+    } else if (percentile > 80) {
+      status = "OVEREXTENDED";
+    }
+
+    setValuation({
+      percentile: parseFloat(percentile.toFixed(1)),
+      zScore: parseFloat(zScore.toFixed(2)),
+      mean30d: parseFloat(mean.toFixed(2)),
+      min30d: Math.min(...prices),
+      max30d: Math.max(...prices),
+      status
+    });
   };
 
   const mergeParsedDays = (maxArr: any[], minArr: any[], avgArr: any[], usdMyr: number) => {
@@ -1126,8 +1221,8 @@ export default function GoldMonitor() {
         </header>
 
         {/* HERO DISPLAY INDEX SECTION */}
-        <section className="text-center py-10 px-4">
-          <p className={`text-[11px] tracking-[0.12em] uppercase font-semibold ${css.textMuted} mb-3.5`}>
+        <section className="text-center py-8 px-4">
+          <p className={`text-[11px] tracking-[0.12em] uppercase font-semibold ${css.textMuted} mb-2`}>
             {t("hero_eyebrow")}
           </p>
           <div className="font-[family:var(--font-barlow)] font-bold tracking-tighter text-[72px] sm:text-[96px] md:text-[110px] lg:text-[120px] leading-none select-all relative inline-block">
@@ -1140,7 +1235,7 @@ export default function GoldMonitor() {
             {t("hero_unit")}
           </p>
           
-          <div className="mt-4">
+          <div className="mt-3">
             {pricesGram.gram > 0 ? (
               <span className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold border ${pricesGram.chg >= 0 ? css.pillGreen : css.pillRed}`}>
                 {pricesGram.chg >= 0 ? "+" : ""}
@@ -1154,9 +1249,104 @@ export default function GoldMonitor() {
             )}
           </div>
 
-          <p className={`text-[11px] ${css.textMuted} mt-3`}>
+          <p className={`text-[11px] ${css.textMuted} mt-3.5`}>
             {pricesGram.gram > 0 ? t("market_ts")(market.date, new Date().toLocaleTimeString("en-MY")) : "—"}
           </p>
+        </section>
+
+        {/* ════ MATHEMATICAL VALUATION CARD PANEL ════ */}
+        <section className={`border-[0.5px] ${css.borderMain} ${css.bgSurface} rounded-xl p-5 mb-6 shadow-md transition-all`}>
+          <div className="flex items-center gap-2.5 pb-4 border-b border-[rgba(201,151,42,0.06)]">
+            <Scale className="w-4 h-4 text-[#C9972A]" />
+            <span className={`text-[10px] uppercase font-bold tracking-widest ${css.textMuted}`}>
+              {t("val_card_title")}
+            </span>
+          </div>
+
+          {!valuation ? (
+            <div className="py-8 text-center">
+              <p className={`text-xs ${css.textMuted} mb-4`}>{t("val_not_computed")}</p>
+              <button 
+                onClick={loadChartData} 
+                disabled={chartLoading}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-transparent border border-[rgba(201,151,42,0.35)] text-[#C9972A] hover:bg-[rgba(201,151,42,0.08)] hover:text-[#E8B84B] font-semibold text-xs rounded transition-colors cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${chartLoading ? "animate-spin" : ""}`} />
+                <span>{t("ch_load_btn")}</span>
+              </button>
+            </div>
+          ) : (
+            <div className="pt-4 space-y-6">
+              
+              {/* Core Status & Color Gauge Banner */}
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2.5">
+                    <span className={`w-3 h-3 rounded-full ${
+                      valuation.status === "UNDERVALUED" ? "bg-[#4CAF72]" :
+                      valuation.status === "BELOW_AVERAGE" ? "bg-[#81C784]" :
+                      valuation.status === "FAIR_VALUE" ? "bg-[#E8B84B]" :
+                      valuation.status === "ABOVE_AVERAGE" ? "bg-[#FFB74D]" : "bg-[#E05555]"
+                    }`} />
+                    <h4 className="font-bold text-lg tracking-tight">
+                      {valuation.status === "UNDERVALUED" && t("val_status_undervalued")}
+                      {valuation.status === "BELOW_AVERAGE" && t("val_status_belowaverage")}
+                      {valuation.status === "FAIR_VALUE" && t("val_status_fairvalue")}
+                      {valuation.status === "ABOVE_AVERAGE" && t("val_status_aboveaverage")}
+                      {valuation.status === "OVEREXTENDED" && t("val_status_overextended")}
+                    </h4>
+                  </div>
+                  <p className={`text-xs leading-relaxed mt-1.5 ${css.textMuted}`}>
+                    {valuation.status === "UNDERVALUED" && t("val_desc_undervalued")}
+                    {valuation.status === "BELOW_AVERAGE" && t("val_desc_belowaverage")}
+                    {valuation.status === "FAIR_VALUE" && t("val_desc_fairvalue")}
+                    {valuation.status === "ABOVE_AVERAGE" && t("val_desc_aboveaverage")}
+                    {valuation.status === "OVEREXTENDED" && t("val_desc_overextended")}
+                  </p>
+                </div>
+                
+                {/* Numeric Big Indicators */}
+                <div className="flex items-center gap-4 flex-shrink-0">
+                  <div className={`px-4 py-2.5 rounded-lg ${css.bgPanel} text-center min-w-[100px] border ${css.borderMain}`}>
+                    <span className={`text-[9px] block uppercase font-bold tracking-wider ${css.textMuted} mb-1`}>{t("val_metric_percentile")}</span>
+                    <span className="font-[family:var(--font-barlow)] text-xl font-bold">{valuation.percentile}%</span>
+                  </div>
+                  <div className={`px-4 py-2.5 rounded-lg ${css.bgPanel} text-center min-w-[100px] border ${css.borderMain}`}>
+                    <span className={`text-[9px] block uppercase font-bold tracking-wider ${css.textMuted} mb-1`}>{t("val_metric_zscore")}</span>
+                    <span className="font-[family:var(--font-barlow)] text-xl font-bold">{valuation.zScore > 0 ? `+${valuation.zScore}` : valuation.zScore}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Distribution Range Bar */}
+              <div className="space-y-2">
+                <div className="relative w-full h-3 rounded-full bg-[rgba(201,151,42,0.06)] border border-[rgba(201,151,42,0.12)] overflow-visible">
+                  {/* Visual segment bands */}
+                  <div className="absolute top-0 bottom-0 left-0 w-[20%] bg-[#4CAF72]/15 rounded-l-full" title="0-20%: Undervalued" />
+                  <div className="absolute top-0 bottom-0 left-[20%] w-[25%] bg-[#81C784]/10" title="20-45%: Below Average" />
+                  <div className="absolute top-0 bottom-0 left-[45%] w-[10%] bg-[#E8B84B]/10" title="45-55%: Fair Value" />
+                  <div className="absolute top-0 bottom-0 left-[55%] w-[25%] bg-[#FFB74D]/10" title="55-80%: Above Average" />
+                  <div className="absolute top-0 bottom-0 left-[80%] w-[20%] bg-[#E05555]/15 rounded-r-full" title="80-100%: Overextended" />
+
+                  {/* Pin tracker representation */}
+                  <div 
+                    className="absolute top-1/2 -translate-y-1/2 -ml-2 w-4 h-4 rounded-full bg-[#E8B84B] border-2 border-[#131310] shadow-[0_0_10px_rgba(232,184,75,0.6)] flex items-center justify-center z-10 transition-all duration-500"
+                    style={{ left: `${valuation.percentile}%` }}
+                  >
+                    <div className="w-1 h-1 rounded-full bg-black"></div>
+                  </div>
+                </div>
+
+                {/* Range markers */}
+                <div className="flex items-center justify-between text-[10px] font-semibold text-[#6B6455]">
+                  <span>RM {valuation.min30d.toFixed(2)} ({lang === "bm" ? "Min 30-Hari" : "30D Min"})</span>
+                  <span>RM {valuation.mean30d.toFixed(2)} ({lang === "bm" ? "Purata" : "Average"})</span>
+                  <span>RM {valuation.max30d.toFixed(2)} ({lang === "bm" ? "Maks 30-Hari" : "30D Max"})</span>
+                </div>
+              </div>
+
+            </div>
+          )}
         </section>
 
         {/* FIVE-KEY METRICS STRIP CARD-GRID */}
