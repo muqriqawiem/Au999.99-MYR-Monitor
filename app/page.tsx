@@ -171,20 +171,20 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
 
     // Valuation Indicator Localization
     val_card_title: "Is gold expensive today?",
-    val_not_computed: "Load 30-day chart data to analyze valuation indicators.",
-    val_metric_percentile: "Percentile Rank",
-    val_metric_zscore: "Z-Score Deviation",
-    val_metric_range: "30-Day Range Bound",
-    val_status_undervalued: "Undervalued (Discount Window)",
-    val_status_belowaverage: "Below Average Price",
-    val_status_fairvalue: "Fair Value (Median)",
-    val_status_aboveaverage: "Above Average Price",
-    val_status_overextended: "Overextended (Local Peak)",
-    val_desc_undervalued: "The gold price sits near local lows. Historically favorable window for lump-sum or scheduled purchases.",
-    val_desc_belowaverage: "Gold is trading in the lower half of its 30-day historical distribution. Statistically sound buying region.",
-    val_desc_fairvalue: "Trading close to the mathematical 30-day median. Safe for standard transactional requirements.",
-    val_desc_aboveaverage: "Price is elevated above median parameters. Consider splitting purchases into smaller tranches (DCA).",
-    val_desc_overextended: "Trading near peak standard deviations. High short-term pullback probability. Avoid large capital allocations today."
+    val_not_computed: "Load 30 days of price data to see today's gold value analysis.",
+    val_metric_percentile: "Price Ranking",
+    val_metric_zscore: "Price vs Average",
+    val_metric_range: "Position in 30-Day Range",
+    val_status_undervalued: "Excellent Time to Buy",
+    val_status_belowaverage: "Good Time to Buy",
+    val_status_fairvalue: "Fair Price",
+    val_status_aboveaverage: "Slightly Expensive",
+    val_status_overextended: "Expensive Right Now",
+    val_desc_undervalued: "Gold is trading near its recent lows. Historically, this has been a favorable time to buy.",
+    val_desc_belowaverage: "Gold is priced below its recent average. A reasonable buying opportunity.",
+    val_desc_fairvalue: "Gold is trading around its normal price range. Suitable for regular purchases.",
+    val_desc_aboveaverage: "Gold is trading above its recent average. Consider buying gradually instead of all at once.",
+    val_desc_overextended: "Gold is trading near recent highs. Prices may pull back, so it may be wise to avoid large purchases today."
   },
   bm: {
     brand_title: "Monitor Au 999.9",
@@ -315,20 +315,20 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
 
     // Valuation Indicator BM Localization
     val_card_title: "Adakah emas mahal hari ini?",
-    val_not_computed: "Muatkan data carta 30-hari untuk menganalisis penunjuk penilaian.",
-    val_metric_percentile: "Peringkat Persentil",
-    val_metric_zscore: "Sisihan Skor-Z",
-    val_metric_range: "Sempadan Julat 30-Hari",
-    val_status_undervalued: "Kurang Nilai (Tetingkap Diskaun)",
-    val_status_belowaverage: "Di Bawah Harga Purata",
-    val_status_fairvalue: "Nilai Saksama (Median)",
-    val_status_aboveaverage: "Di Atas Harga Purata",
-    val_status_overextended: "Nilai Terlebih Tinggi (Puncak Tempatan)",
-    val_desc_undervalued: "Harga emas berada berhampiran paras terendah tempatan. Masa yang sangat sesuai untuk pembelian sekaligus atau terkumpul.",
-    val_desc_belowaverage: "Emas didagangkan di bawah separuh daripada taburan sejarah 30 hari. Kawasan belian yang kukuh dari segi statistik.",
-    val_desc_fairvalue: "Didagangkan berhampiran median matematik 30 hari. Selamat untuk keperluan transaksi standard.",
-    val_desc_aboveaverage: "Harga meningkat melebihi parameter median. Pertimbangkan untuk membahagikan pembelian kepada bahagian yang lebih kecil (DCA).",
-    val_desc_overextended: "Didagangkan berhampiran puncak sisihan piawai. Kebarangkalian tinggi untuk penurunan jangka pendek. Elakkan pembelian besar hari ini."
+    val_not_computed: "Muatkan data harga 30 hari untuk melihat analisis nilai emas hari ini.",
+    val_metric_percentile: "Kedudukan Harga",
+    val_metric_zscore: "Harga Berbanding Purata",
+    val_metric_range: "Kedudukan Dalam Julat 30 Hari",
+    val_status_undervalued: "Masa Sangat Baik Untuk Membeli",
+    val_status_belowaverage: "Masa Baik Untuk Membeli",
+    val_status_fairvalue: "Harga Berpatutan",
+    val_status_aboveaverage: "Agak Mahal",
+    val_status_overextended: "Mahal Buat Masa Ini",
+    val_desc_undervalued: "Harga emas berada berhampiran paras rendah kebelakangan ini. Secara sejarah, ini sering menjadi masa yang baik untuk membeli.",
+    val_desc_belowaverage: "Harga emas berada di bawah purata terkini. Peluang yang munasabah untuk membeli.",
+    val_desc_fairvalue: "Harga emas berada dalam julat harga biasa. Sesuai untuk pembelian seperti biasa.",
+    val_desc_aboveaverage: "Harga emas berada di atas purata terkini. Pertimbangkan untuk membeli secara berperingkat berbanding sekaligus.",
+    val_desc_overextended: "Harga emas berada berhampiran paras tertinggi terkini. Harga mungkin menurun semula, jadi elakkan pembelian besar jika tidak perlu."
   }
 };
 
