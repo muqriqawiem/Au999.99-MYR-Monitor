@@ -1304,57 +1304,6 @@ export default function GoldMonitor() {
           </div>
         </section>
 
-        {/* CONVERSION / COST CALCULATOR */}
-        <section className={`border-[0.5px] ${css.borderMain} ${css.bgSurface} rounded-xl p-5 mb-6 shadow-md`}>
-          <div className="flex items-center justify-between pb-4 border-b border-[rgba(201,151,42,0.06)] flex-wrap gap-3">
-            <div className="flex items-center gap-2">
-              <Coins className="w-4 h-4 text-[#C9972A]" />
-              <div>
-                <p className={`text-[10px] uppercase font-bold tracking-widest ${css.textMuted}`}>{t("calculator_title")}</p>
-                <p className={`text-[11px] ${css.textMuted}`}>{t("calculator_sub")}</p>
-              </div>
-            </div>
-            <span className={`text-[11px] ${css.textMuted}`}>{t("calculator_note")}</span>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 mt-5">
-            <label className="flex flex-col gap-2 text-sm">
-              <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#6B6455]">{t("calculator_myr")}</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={calculator.myr}
-                onChange={(e) => handleCalculatorChange("myr", e.target.value)}
-                placeholder={t("calculator_input_myr")}
-                className={`w-full border ${css.borderDim} rounded-md px-3 py-2 text-sm ${css.cardInputBg} focus:outline-none focus:border-[#C9972A]`}
-              />
-            </label>
-            <label className="flex flex-col gap-2 text-sm">
-              <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#6B6455]">{t("calculator_gram")}</span>
-              <input
-                type="number"
-                min="0"
-                step="0.0001"
-                value={calculator.gram}
-                onChange={(e) => handleCalculatorChange("gram", e.target.value)}
-                placeholder={t("calculator_input_gram")}
-                className={`w-full border ${css.borderDim} rounded-md px-3 py-2 text-sm ${css.cardInputBg} focus:outline-none focus:border-[#C9972A]`}
-              />
-            </label>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <p className={`text-[11px] ${css.textMuted}`}>RM per gram: {pricesGram.gram > 0 ? pricesGram.gram.toFixed(2) : "—"}</p>
-            <button
-              onClick={resetCalculator}
-              className="px-3 py-2 rounded-md border border-[rgba(201,151,42,0.18)] text-[11px] font-semibold text-[#C9972A] hover:bg-[rgba(201,151,42,0.08)] transition-colors"
-            >
-              Reset
-            </button>
-          </div>
-        </section>
-
         {/* ════ MATHEMATICAL VALUATION CARD PANEL ════ */}
         <section className={`border-[0.5px] ${css.borderMain} ${css.bgSurface} rounded-xl p-5 mb-6 shadow-md transition-all`}>
           <div className="flex items-center gap-2.5 pb-4 border-b border-[rgba(201,151,42,0.06)]">
@@ -1448,6 +1397,57 @@ export default function GoldMonitor() {
 
             </div>
           )}
+        </section>
+
+        {/* CONVERSION / COST CALCULATOR */}
+        <section className={`border-[0.5px] ${css.borderMain} ${css.bgSurface} rounded-xl p-5 mb-6 shadow-md`}>
+          <div className="flex items-center justify-between pb-4 border-b border-[rgba(201,151,42,0.06)] flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <Coins className="w-4 h-4 text-[#C9972A]" />
+              <div>
+                <p className={`text-[10px] uppercase font-bold tracking-widest ${css.textMuted}`}>{t("calculator_title")}</p>
+                <p className={`text-[11px] ${css.textMuted}`}>{t("calculator_sub")}</p>
+              </div>
+            </div>
+            <span className={`text-[11px] ${css.textMuted}`}>{t("calculator_note")}</span>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 mt-5">
+            <label className="flex flex-col gap-2 text-sm">
+              <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#6B6455]">{t("calculator_myr")}</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={calculator.myr}
+                onChange={(e) => handleCalculatorChange("myr", e.target.value)}
+                placeholder={t("calculator_input_myr")}
+                className={`w-full border ${css.borderDim} rounded-md px-3 py-2 text-sm ${css.cardInputBg} focus:outline-none focus:border-[#C9972A]`}
+              />
+            </label>
+            <label className="flex flex-col gap-2 text-sm">
+              <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[#6B6455]">{t("calculator_gram")}</span>
+              <input
+                type="number"
+                min="0"
+                step="0.0001"
+                value={calculator.gram}
+                onChange={(e) => handleCalculatorChange("gram", e.target.value)}
+                placeholder={t("calculator_input_gram")}
+                className={`w-full border ${css.borderDim} rounded-md px-3 py-2 text-sm ${css.cardInputBg} focus:outline-none focus:border-[#C9972A]`}
+              />
+            </label>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p className={`text-[11px] ${css.textMuted}`}>RM per gram: {pricesGram.gram > 0 ? pricesGram.gram.toFixed(2) : "—"}</p>
+            <button
+              onClick={resetCalculator}
+              className="px-3 py-2 rounded-md border border-[rgba(201,151,42,0.18)] text-[11px] font-semibold text-[#C9972A] hover:bg-[rgba(201,151,42,0.08)] transition-colors"
+            >
+              Reset
+            </button>
+          </div>
         </section>
 
         {/* ════ HISTORICAL RANGE CHART PANEL ════ */}
