@@ -189,7 +189,7 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
   bm: {
     brand_title: "Monitor Au 999.9",
     brand_sub: "Ringgit Malaysia · Per Gram",
-    live: "Masa Nyata",
+    live: "Langsung",
     how_to_read: "Cara membaca ini",
     api_key: "Kunci API",
     refresh: "Muat Semula",
@@ -205,7 +205,7 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     m_lo_lbl: "Terendah hari ini",
     m_op_lbl: "Harga pembukaan",
     per_gram: "per gram",
-    alerts_title: "Peringatan harga",
+    alerts_title: "Amaran Harga",
     calculator_title: "Kalkulator Emas",
     calculator_sub: "Tukar antara RM dan gram menggunakan harga semasa RM/g",
     calculator_myr: "Ringgit Malaysia",
@@ -1482,7 +1482,7 @@ export default function GoldMonitor() {
               <Coins className="w-4 h-4 text-[#C9972A]" />
               <div>
                 <p className={`text-[10px] uppercase font-bold tracking-widest ${css.textMuted}`}>{t("calculator_title")}</p>
-                <p className={`text-[11px] ${css.textMuted}`}>{t("calculator_sub")}</p>
+                {/* <p className={`text-[11px] ${css.textMuted}`}>{t("calculator_sub")}</p> */}
               </div>
             </div>
             <span className={`text-[11px] ${css.textMuted}`}>{t("calculator_note")}</span>
